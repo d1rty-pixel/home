@@ -44,7 +44,9 @@ starship prompt take effect.
   distro-default terminal on Debian/Ubuntu.
 - **Editors/tools:** vim, micro (catppuccin), meld, git, ripgrep, btop, glances,
   fastfetch, duf, ufw, rsync, wget.
-- **GUI apps:** firefox, vlc, haruna, spotify (Arch), pavucontrol.
+- **GUI apps:** firefox, thunderbird, vlc, haruna, spotify, google-chrome, pavucontrol,
+  and JetBrains Toolbox (which manages IntelliJ IDEA). Chrome is AUR on Arch; on Debian
+  Spotify/Chrome come from vendor apt repos. Toolbox is a shared tarball-install role.
 - **AUR:** installs `yay` on Arch so AUR packages can be added later.
 - **Claude Code:** installs the `claude` CLI.
 - **Dotfiles:** symlinked from this repo into `$HOME`, so edits stay git-tracked.
@@ -68,6 +70,7 @@ roles/
   aur/                Arch-only: builds yay, installs AUR packages
   starship/           installs starship (pacman / official installer)
   claude-code/        installs the claude CLI
+  jetbrains-toolbox/  installs JetBrains Toolbox (tarball; manages IntelliJ IDEA)
   dotfiles/           symlinks configs into $HOME, templates .gitconfig
   shell/              sets bash as the default login shell
 ```

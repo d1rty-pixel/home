@@ -1,0 +1,55 @@
+---
+# JetBrains Toolbox — the launcher that installs and updates IntelliJ IDEA (and
+# other JetBrains IDEs). OS-agnostic tarball install, so it works the same on
+# Arch and Debian. The IDEs themselves are then installed from the Toolbox GUI.
+
+- name: Ensure FUSE (required by the Toolbox AppImage) is installed
+  ansible.builtin.package:
+    name: "{{ 'fuse2' if ansible_facts['os_family'] == 'Archlinux' else 'libfuse2' }}"
+    state: present
+  become: true
+
+- name: Check whether JetBrains Toolbox is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/jetbrains-toolbox
+  register: jb_toolbox
+
+- name: Install JetBrains Toolbox
+  when: not jb_toolbox.stat.exists
+  become: true
+  block:
+    - name: Download the latest Toolbox tarball
+      ansible.builtin.get_url:
+        url: "{{ jetbrains_toolbox_url }}"
+        dest: /tmp/jetbrains-toolbox.tar.gz
+        mode: "0644"
+
+    - name: Create the Toolbox install directory
+      ansible.builtin.file:
+        path: "{{ jetbrains_toolbox_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Extract Toolbox
+      ansible.builtin.unarchive:
+        src: /tmp/jetbrains-toolbox.tar.gz
+        dest: "{{ jetbrains_toolbox_dir }}"
+        remote_src: true
+        extra_opts: ["--strip-components=1"]
+
+    # The binary's path inside the archive changes between Toolbox versions
+    # (top-level vs bin/), so locate it rather than hard-coding the path.
+    - name: Locate the Toolbox executable
+      ansible.builtin.find:
+        paths: "{{ jetbrains_toolbox_dir }}"
+        patterns: "jetbrains-toolbox"
+        file_type: file
+        recurse: true
+      register: jb_toolbox_bin
+
+    - name: Symlink Toolbox onto PATH
+      ansible.builtin.file:
+        src: "{{ (jb_toolbox_bin.files | first).path }}"
+        dest: /usr/local/bin/jetbrains-toolbox
+        state: link
+      when: jb_toolbox_bin.matched > 0

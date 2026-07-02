@@ -1,0 +1,4 @@
+---
+jetbrains_toolbox_dir: /opt/jetbrains-toolbox
+# Latest Toolbox tarball (redirects to the current version).
+jetbrains_toolbox_url: "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"

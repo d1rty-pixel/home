@@ -15,3 +15,7 @@
   when:
     - install_gui | bool
     - gui_packages | length > 0
+
+- name: Install third-party desktop apps (Spotify, Google Chrome)
+  ansible.builtin.include_tasks: Debian-thirdparty.yml
+  when: install_gui | bool

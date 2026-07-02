@@ -26,9 +26,11 @@ gui_packages:
   - thunderbird
   - vlc
   - haruna
-  # TODO: spotify — no apt package; install via flatpak or the official repo.
-  # TODO: google-chrome — add Google's apt repo, package 'google-chrome-stable'.
-  # TODO: intellij-idea — install via flatpak, snap, or the JetBrains Toolbox.
+
+# Spotify and Google Chrome are NOT plain apt packages — they come from third-party
+# apt repos and are installed by roles/packages/tasks/Debian-thirdparty.yml.
+# JetBrains Toolbox (which manages IntelliJ IDEA) is installed by the shared,
+# OS-agnostic `jetbrains-toolbox` role. All are gated by install_gui.
 
 # Not used on Debian, kept so shared tasks referencing it don't error.
 aur_packages: []

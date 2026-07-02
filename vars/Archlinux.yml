@@ -27,7 +27,7 @@ gui_packages:
   - thunderbird
   - vlc
   - haruna
-  - intellij-idea-community-edition   # Ultimate is AUR (intellij-idea-ultimate-edition) + license
+  # IntelliJ IDEA is installed via the JetBrains Toolbox role (not a package here).
 
 # AUR packages — built and installed by roles/aur (needs yay/base-devel).
 aur_packages:

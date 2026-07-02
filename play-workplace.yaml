@@ -13,5 +13,7 @@
       when: ansible_facts['os_family'] == 'Archlinux'
     - starship
     - claude-code
+    - role: jetbrains-toolbox
+      when: install_gui | bool
     - dotfiles
     - shell

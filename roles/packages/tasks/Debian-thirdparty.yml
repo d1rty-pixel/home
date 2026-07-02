@@ -1,0 +1,77 @@
+---
+# Desktop apps that live in third-party apt repos rather than Debian's own.
+# UNTESTED: transcribed from each vendor's documented install steps — verify the
+# key URLs / suite names on a real Debian/Ubuntu box (vendors rotate signing keys).
+
+- name: Ensure apt keyring helpers are present
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure the apt keyrings directory exists
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+  become: true
+
+# --- Spotify (official repository) -----------------------------------------
+- name: Fetch the Spotify signing key
+  ansible.builtin.get_url:
+    # NOTE: Spotify rotates this key ID periodically; update from spotify.com if apt complains.
+    url: https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg
+    dest: /tmp/spotify.pub
+    mode: "0644"
+  become: true
+
+- name: Install the Spotify keyring
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/spotify.gpg /tmp/spotify.pub
+    creates: /usr/share/keyrings/spotify.gpg
+  become: true
+
+- name: Add the Spotify apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/spotify.gpg] https://repository.spotify.com stable non-free"
+    filename: spotify
+    state: present
+  become: true
+
+- name: Install Spotify
+  ansible.builtin.apt:
+    name: spotify-client
+    state: present
+    update_cache: true
+  become: true
+
+# --- Google Chrome (Google's apt repository) -------------------------------
+- name: Fetch the Google signing key
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    dest: /tmp/google.pub
+    mode: "0644"
+  become: true
+
+- name: Install the Google Chrome keyring
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/google-chrome.gpg /tmp/google.pub
+    creates: /usr/share/keyrings/google-chrome.gpg
+  become: true
+
+- name: Add the Google Chrome apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main"
+    filename: google-chrome
+    state: present
+  become: true
+
+- name: Install Google Chrome
+  ansible.builtin.apt:
+    name: google-chrome-stable
+    state: present
+    update_cache: true
+  become: true
