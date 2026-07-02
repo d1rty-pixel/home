@@ -31,7 +31,7 @@ git remote set-url origin git@github.com:d1rty-pixel/home.git
    connection. (Not required for the HTTPS clone — this is so you can *push* later.)
 4. Clone/update this repo to `~/Projekte/workplace`.
 5. Install the required Ansible collections.
-6. Run `site.yml` (prompts once for your sudo password).
+6. Run `play-workplace.yaml` (prompts once for your sudo password).
 
 After it finishes, log out/in (or `exec bash`) so the shell change, `$EDITOR` and the
 starship prompt take effect.
@@ -55,9 +55,9 @@ starship prompt take effect.
 
 ```
 bootstrap.sh          one-command entrypoint
-site.yml              main playbook (loads vars by OS family, runs roles)
+play-workplace.yaml   main playbook (loads vars by OS family, runs roles)
 ansible.cfg           inventory/roles/become defaults
-inventory.ini         localhost, local connection
+inventory.ini         localhost + empty [workstation] group for remote machines
 requirements.yml      Ansible collections (community.general)
 group_vars/all.yml    feature toggles + git identity
 vars/
@@ -85,8 +85,8 @@ roles/
 
 ```sh
 cd ~/Projekte/workplace
-ansible-playbook -i inventory.ini site.yml --syntax-check
-ansible-playbook -i inventory.ini site.yml --check --diff --ask-become-pass
+ansible-playbook -i inventory.ini play-workplace.yaml --syntax-check
+ansible-playbook -i inventory.ini play-workplace.yaml --check --diff --ask-become-pass
 ```
 
 ## Adding a Debian/Ubuntu machine later

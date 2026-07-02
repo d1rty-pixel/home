@@ -149,7 +149,7 @@ ansible-galaxy collection install -r requirements.yml
 # 6. run the playbook
 # ---------------------------------------------------------------------------
 info "Running the Ansible playbook (you'll be asked for your sudo password)..."
-ansible-playbook -i inventory.ini site.yml --ask-become-pass
+ansible-playbook -i inventory.ini play-workplace.yaml --ask-become-pass
 
 # ---------------------------------------------------------------------------
 # 7. done

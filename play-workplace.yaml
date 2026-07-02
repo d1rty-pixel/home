@@ -1,6 +1,6 @@
 ---
 - name: Provision the workplace
-  hosts: all
+  hosts: localhost,workstation
   gather_facts: true
 
   pre_tasks:
