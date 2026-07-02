@@ -134,6 +134,14 @@ Manual run:
 ansible-playbook -i inventory.ini play-workplace.yaml --ask-become-pass --ask-vault-pass
 ```
 
+## Chrome / Google account
+
+Chrome is installed by the repo, but its login is **not** captured like Thunderbird —
+Chrome ties cookies/passwords to the OS keyring, so a copied profile won't decrypt on
+another machine. Use **Chrome Sync** instead: sign in to your Google account on each
+machine and enable Sync (optionally with a sync passphrase). Bookmarks, passwords,
+history and extensions then sync automatically — nothing Chrome-related is stored here.
+
 ## Adding a Debian/Ubuntu machine later
 
 `vars/Debian.yml` and the apt task path already exist. Fill in/verify the package names
