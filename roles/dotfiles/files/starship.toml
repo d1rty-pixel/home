@@ -1,32 +1,75 @@
 # ~/.config/starship.toml  (managed by the workplace repo)
 # Docs: https://starship.rs/config/
-# Starter config — tweak freely, changes stay git-tracked via the symlink.
+#
+# A classic bash-style prompt — [user@host dir]$ — but colorized and with
+# git status, command duration, exit code and battery state.
 
-add_newline = true
+# No blank line before the prompt (like a plain bash PS1).
+add_newline = false
 
-format = """
-$directory\
-$git_branch\
-$git_status\
-$cmd_duration\
-$character"""
+format = "[\\[](bold white)$username[@](bold white)$hostname $directory[\\]](bold white)$git_branch$git_status$cmd_duration$status$battery$character "
 
-[character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
+[username]
+show_always = true
+style_user = "bold cyan"
+style_root = "bold red"
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = false
+style = "bold green"
+format = "[$hostname]($style)"
 
 [directory]
 truncation_length = 3
-truncate_to_repo = true
-style = "bold cyan"
+truncate_to_repo = false
+truncation_symbol = "…/"
+style = "bold blue"
+format = "[$path]($style)[$read_only]($read_only_style)"
+read_only = " 🔒"
+read_only_style = "bold red"
 
 [git_branch]
+symbol = " "
 style = "bold purple"
+format = "[ $symbol$branch]($style)"
 
 [git_status]
 style = "bold red"
+format = "([ $all_status$ahead_behind]($style))"
 
 [cmd_duration]
 min_time = 500
-format = "took [$duration]($style) "
 style = "bold yellow"
+format = "[ took $duration]($style)"
+
+# Show the exit code when the last command failed.
+[status]
+disabled = false
+style = "bold red"
+symbol = "✘"
+format = "[ $symbol$status]($style)"
+
+# Battery — always shown, colored by charge level.
+[battery]
+full_symbol = "🔋"
+charging_symbol = "⚡"
+discharging_symbol = "🔋"
+format = "[ $symbol$percentage]($style)"
+
+[[battery.display]]
+threshold = 15
+style = "bold red"
+
+[[battery.display]]
+threshold = 50
+style = "bold yellow"
+
+[[battery.display]]
+threshold = 100
+style = "bold green"
+
+# Prompt symbol: $ (green on success, red on failure), like bash.
+[character]
+success_symbol = "[\\$](bold green)"
+error_symbol = "[\\$](bold red)"
