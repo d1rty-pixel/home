@@ -1,0 +1,14 @@
+# ~/.ssh/config  (managed by the workplace repo)
+# No secrets here — just host aliases and sane defaults.
+
+Host *
+    AddKeysToAgent yes
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    HashKnownHosts yes
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    PreferredAuthentications publickey

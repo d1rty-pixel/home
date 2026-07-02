@@ -3,6 +3,7 @@
 dotfiles_src: "{{ playbook_dir }}/roles/dotfiles/files"
 
 # Each dotfile: `src` is relative to dotfiles_src, `dest` is relative to $HOME.
+# Optional `dir_mode` sets the parent directory's mode (default 0755).
 dotfiles_links:
   - { src: "bashrc",                   dest: ".bashrc" }
   - { src: "bash_profile",             dest: ".bash_profile" }
@@ -11,3 +12,4 @@ dotfiles_links:
   - { src: "alacritty/alacritty.toml", dest: ".config/alacritty/alacritty.toml" }
   - { src: "micro/settings.json",      dest: ".config/micro/settings.json" }
   - { src: "starship.toml",            dest: ".config/starship.toml" }
+  - { src: "ssh/config",               dest: ".ssh/config", dir_mode: "0700" }

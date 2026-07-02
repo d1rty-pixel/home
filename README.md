@@ -48,7 +48,8 @@ starship prompt take effect.
 - **AUR:** installs `yay` on Arch so AUR packages can be added later.
 - **Claude Code:** installs the `claude` CLI.
 - **Dotfiles:** symlinked from this repo into `$HOME`, so edits stay git-tracked.
-  A `~/.gitconfig` is templated from `group_vars/all.yml`.
+  A `~/.gitconfig` is templated from `group_vars/all.yml`, and a `~/.ssh/config`
+  (github.com host block + sane defaults; `~/.ssh` kept at `0700`) is linked in.
 
 ## Layout
 
