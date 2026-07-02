@@ -23,5 +23,6 @@
       when:
         - install_gui | bool
         - deploy_thunderbird | bool
+      tags: thunderbird
     - dotfiles
     - shell
