@@ -1,0 +1,49 @@
+---
+# Deploys a captured Thunderbird profile (accounts + saved passwords). The profile
+# files under files/profile/ are Ansible-Vault-encrypted and decrypted on copy.
+# Capture them from a configured machine with scripts/capture-thunderbird.sh.
+
+- name: Look for a captured (vault-encrypted) Thunderbird profile
+  ansible.builtin.set_fact:
+    thunderbird_captured: "{{ query('fileglob', 'profile/*') }}"
+
+- name: Deploy Thunderbird profile
+  when: thunderbird_captured | length > 0
+  block:
+    - name: Check whether Thunderbird is running
+      ansible.builtin.command: pgrep -x thunderbird
+      register: tb_running
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Refuse to deploy while Thunderbird is running
+      ansible.builtin.fail:
+        msg: >-
+          Thunderbird is running — close it first. It rewrites its profile on exit
+          and would overwrite the deployed accounts/passwords.
+      when: tb_running.rc == 0
+
+    - name: Ensure the Thunderbird profile directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts.env.HOME }}/.thunderbird/{{ thunderbird_profile }}"
+        state: directory
+        mode: "0700"
+
+    - name: Point profiles.ini at the deployed profile
+      ansible.builtin.template:
+        src: profiles.ini.j2
+        dest: "{{ ansible_facts.env.HOME }}/.thunderbird/profiles.ini"
+        mode: "0644"
+
+    # force:false → never clobber an already-configured profile; this only seeds a
+    # fresh machine. To re-deploy, remove the target files first.
+    - name: Deploy the vault-encrypted profile files (decrypted on copy)
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ ansible_facts.env.HOME }}/.thunderbird/{{ thunderbird_profile }}/{{ item | basename }}"
+        mode: "0600"
+        force: false
+      loop: "{{ thunderbird_captured }}"
+      loop_control:
+        label: "{{ item | basename }}"

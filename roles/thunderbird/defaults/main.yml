@@ -1,0 +1,8 @@
+---
+# The Thunderbird profile directory name to deploy into (kept stable across machines
+# so profiles.ini and the captured files line up).
+thunderbird_profile: "o9utqzgx.default-release"
+
+# Install section id in profiles.ini (from this machine's profiles.ini). Harmless if
+# it doesn't match another machine's install — Thunderbird falls back to Default=1.
+thunderbird_install_id: "FDC34C9F024745EB"

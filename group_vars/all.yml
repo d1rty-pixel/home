@@ -5,6 +5,11 @@
 # Install GUI applications (firefox, vlc, ...). Flip to false on a headless box.
 install_gui: true
 
+# Deploy the captured Thunderbird profile (accounts + saved passwords). Needs the
+# vault password and a capture in roles/thunderbird/files/profile/ (see
+# scripts/capture-thunderbird.sh). No-op until a capture exists.
+deploy_thunderbird: true
+
 # ---------------------------------------------------------------------------
 # Git identity — used to template ~/.gitconfig
 # ---------------------------------------------------------------------------

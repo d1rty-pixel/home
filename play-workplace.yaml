@@ -19,5 +19,9 @@
     - claude-code
     - role: jetbrains-toolbox
       when: install_gui | bool
+    - role: thunderbird
+      when:
+        - install_gui | bool
+        - deploy_thunderbird | bool
     - dotfiles
     - shell

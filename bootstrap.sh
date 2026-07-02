@@ -148,8 +148,19 @@ ansible-galaxy collection install -r requirements.yml
 # ---------------------------------------------------------------------------
 # 6. run the playbook
 # ---------------------------------------------------------------------------
+# If the repo contains vault-encrypted files, arrange to supply the vault password:
+# use ./.vault-pass if present (no prompt), otherwise ask interactively.
+vault_args=()
+if grep -rlq '\$ANSIBLE_VAULT' roles/ 2>/dev/null; then
+    if [ -f .vault-pass ]; then
+        vault_args=(--vault-password-file .vault-pass)
+    else
+        vault_args=(--ask-vault-pass)
+    fi
+fi
+
 info "Running the Ansible playbook (you'll be asked for your sudo password)..."
-ansible-playbook -i inventory.ini play-workplace.yaml --ask-become-pass
+ansible-playbook -i inventory.ini play-workplace.yaml --ask-become-pass "${vault_args[@]}"
 
 # ---------------------------------------------------------------------------
 # 7. done

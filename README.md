@@ -82,6 +82,7 @@ roles/
   starship/           installs starship (pacman / official installer)
   claude-code/        installs the claude CLI
   jetbrains-toolbox/  installs JetBrains Toolbox (tarball; manages IntelliJ IDEA)
+  thunderbird/        deploys captured accounts + passwords (Ansible Vault)
   dotfiles/           symlinks configs into $HOME, templates .gitconfig
   shell/              sets bash as the default login shell
 ```
@@ -101,6 +102,34 @@ roles/
 cd ~/Projekte/workplace
 ansible-playbook -i inventory.ini play-workplace.yaml --syntax-check
 ansible-playbook -i inventory.ini play-workplace.yaml --check --diff --ask-become-pass
+```
+
+## Thunderbird accounts (Ansible Vault)
+
+The `thunderbird` role deploys a captured profile — accounts **and** saved passwords —
+so a new machine comes up already configured. The credential files (`key4.db`,
+`logins.json`) and `prefs.js` are **Ansible-Vault-encrypted**, so only ciphertext lives
+in git.
+
+Capture / update from a configured machine (Thunderbird **closed**):
+
+```sh
+# optional: avoid the prompt by storing the vault password (gitignored)
+printf 'your-vault-password' > .vault-pass && chmod 600 .vault-pass
+
+scripts/capture-thunderbird.sh        # copies + vault-encrypts the profile files
+git add roles/thunderbird/files/profile && git commit
+```
+
+Deploy is automatic during `bootstrap.sh`: it detects the vault-encrypted files and
+either reads `./.vault-pass` or prompts (`--ask-vault-pass`). The role **won't overwrite**
+an already-configured profile (`force: false`) and refuses to run while Thunderbird is
+open. It's a no-op until a capture exists. Disable with `deploy_thunderbird: false`.
+
+Manual run:
+
+```sh
+ansible-playbook -i inventory.ini play-workplace.yaml --ask-become-pass --ask-vault-pass
 ```
 
 ## Adding a Debian/Ubuntu machine later

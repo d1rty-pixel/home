@@ -1,3 +1,6 @@
 *.bak
 *.retry
 __pycache__/
+
+# Ansible Vault password — NEVER commit this
+.vault-pass
