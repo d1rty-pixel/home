@@ -1,0 +1,42 @@
+---
+# Build and install a single AUR package without needing passwordless sudo:
+# makepkg builds as the normal user, then Ansible installs the result with become.
+# `item` is the AUR package name.
+#
+# Limitation: assumes build/runtime deps are available in the official repos
+# (add them to system_packages). Packages with AUR dependencies aren't handled here.
+
+- name: "Check whether {{ item }} is already installed"
+  ansible.builtin.command: "pacman -Qq {{ item }}"
+  register: aur_pkg_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: "Build and install {{ item }}"
+  when: aur_pkg_installed.rc != 0
+  block:
+    - name: "Clone {{ item }} from the AUR"
+      ansible.builtin.git:
+        repo: "https://aur.archlinux.org/{{ item }}.git"
+        dest: "/tmp/aur-build/{{ item }}"
+        version: master
+
+    - name: "Build {{ item }} (as the normal user, no install)"
+      ansible.builtin.command:
+        cmd: makepkg -f --noconfirm
+        chdir: "/tmp/aur-build/{{ item }}"
+      become: false
+
+    - name: "Locate the built package for {{ item }}"
+      ansible.builtin.find:
+        paths: "/tmp/aur-build/{{ item }}"
+        patterns: "{{ item }}-*.pkg.tar.*"
+        excludes: "*-debug-*"
+      register: aur_built
+
+    - name: "Install {{ item }} (Ansible handles privilege escalation)"
+      ansible.builtin.command:
+        cmd: "pacman -U --needed --noconfirm {{ aur_built.files | map(attribute='path') | join(' ') }}"
+      become: true
+      when: aur_built.matched > 0

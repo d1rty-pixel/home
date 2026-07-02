@@ -44,10 +44,7 @@
       become: true
       when: yay_pkg.matched > 0
 
-- name: Install AUR packages
-  kewlfft.aur.aur:
-    name: "{{ aur_packages }}"
-    state: present
-    use: yay
-  become: false
+- name: Install AUR packages (build as user, install via become)
+  ansible.builtin.include_tasks: install_aur_pkg.yml
+  loop: "{{ aur_packages }}"
   when: aur_packages | length > 0

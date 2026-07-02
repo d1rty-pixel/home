@@ -9,6 +9,7 @@ system_packages:
   - git
   - ripgrep
   - btop
+  - htop
   - glances
   - fastfetch
   - duf
@@ -23,8 +24,11 @@ system_packages:
 gui_packages:
   - firefox
   - firefox-i18n-de
+  - thunderbird
   - vlc
   - haruna
+  - intellij-idea-community-edition   # Ultimate is AUR (intellij-idea-ultimate-edition) + license
 
-# AUR packages (installed via yay). Empty by default.
-aur_packages: []
+# AUR packages — built and installed by roles/aur (needs yay/base-devel).
+aur_packages:
+  - google-chrome

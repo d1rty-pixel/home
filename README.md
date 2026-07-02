@@ -58,7 +58,7 @@ bootstrap.sh          one-command entrypoint
 site.yml              main playbook (loads vars by OS family, runs roles)
 ansible.cfg           inventory/roles/become defaults
 inventory.ini         localhost, local connection
-requirements.yml      Ansible collections (community.general, kewlfft.aur)
+requirements.yml      Ansible collections (community.general)
 group_vars/all.yml    feature toggles + git identity
 vars/
   Archlinux.yml       pacman + AUR + GUI package lists  (populated)
