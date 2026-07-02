@@ -24,11 +24,25 @@
         dest: /tmp/yay-bin
         version: master
 
-    - name: Build and install yay-bin (makepkg must not run as root)
+    # makepkg refuses to run as root, so build as the normal user WITHOUT -i.
+    # (Its internal `sudo pacman -U` has no terminal for the password otherwise.)
+    - name: Build the yay-bin package (as the normal user, no install)
       ansible.builtin.command:
-        cmd: makepkg -si --noconfirm
+        cmd: makepkg -f --noconfirm
         chdir: /tmp/yay-bin
       become: false
+
+    - name: Locate the built yay package
+      ansible.builtin.find:
+        paths: /tmp/yay-bin
+        patterns: "yay-bin-*.pkg.tar.*"
+      register: yay_pkg
+
+    - name: Install the built yay package (Ansible handles privilege escalation)
+      ansible.builtin.command:
+        cmd: "pacman -U --noconfirm {{ yay_pkg.files | map(attribute='path') | join(' ') }}"
+      become: true
+      when: yay_pkg.matched > 0
 
 - name: Install AUR packages
   kewlfft.aur.aur:
