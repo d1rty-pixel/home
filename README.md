@@ -48,6 +48,13 @@ starship prompt take effect.
   and JetBrains Toolbox (which manages IntelliJ IDEA). Chrome is AUR on Arch; on Debian
   Spotify/Chrome come from vendor apt repos. Toolbox is a shared tarball-install role.
 - **AUR:** installs `yay` on Arch so AUR packages can be added later.
+- **Node.js:** full setup via nvm — installs the latest LTS, enables Corepack
+  (yarn/pnpm), and installs any `npm_global_packages`.
+- **Perl:** two module lists — `perl_os_packages` (from pacman/apt, preferred) and
+  `perl_cpan_modules` (via cpanm, discouraged: source build, bypasses the OS manager).
+- **Docker:** Docker Engine + Compose v2, service enabled, your user added to the
+  `docker` group (re-login required).
+- **Browsers:** Firefox is removed once Chrome is installed.
 - **Claude Code:** installs the `claude` CLI.
 - **Dotfiles:** symlinked from this repo into `$HOME`, so edits stay git-tracked.
   A `~/.gitconfig` is templated from `group_vars/all.yml`, and a `~/.ssh/config`
@@ -67,7 +74,11 @@ vars/
   Debian.yml          apt package lists                 (stub, TODO markers)
 roles/
   packages/           installs system + GUI packages per OS family
-  aur/                Arch-only: builds yay, installs AUR packages
+  aur/                Arch-only: builds yay, installs AUR pkgs, drops Firefox for Chrome
+  nodejs/             full Node.js setup via nvm (LTS + corepack + global npm pkgs)
+  perl/               Perl modules: OS packages (preferred) + CPAN (discouraged)
+  docker/             Docker Engine + service + adds you to the docker group
+  docker-compose/     Docker Compose v2 plugin
   starship/           installs starship (pacman / official installer)
   claude-code/        installs the claude CLI
   jetbrains-toolbox/  installs JetBrains Toolbox (tarball; manages IntelliJ IDEA)

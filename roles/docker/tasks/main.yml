@@ -1,0 +1,22 @@
+---
+- name: Install Docker Engine
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: present
+  become: true
+
+- name: Enable and start the Docker service
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  become: true
+
+- name: "Add {{ ansible_user_id }} to the 'docker' group"
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: true
+  become: true
+  # NOTE: docker group membership is root-equivalent and only takes effect after
+  # you log out and back in (or run `newgrp docker`).

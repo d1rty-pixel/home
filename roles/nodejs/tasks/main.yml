@@ -1,0 +1,38 @@
+---
+# Full Node.js setup via nvm (Node Version Manager) — OS-agnostic, per-user.
+# nvm.sh is sourced into bash by the managed ~/.bashrc (see roles/dotfiles).
+
+- name: Install nvm (Node Version Manager)
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash"
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  environment:
+    PROFILE: /dev/null       # don't let the installer edit our managed shell rc
+  become: false
+
+- name: "Install Node.js ({{ node_version }}) and set it as default"
+  ansible.builtin.shell:
+    cmd: >
+      source {{ ansible_env.HOME }}/.nvm/nvm.sh &&
+      nvm install {{ node_version }} &&
+      nvm alias default {{ node_default_alias }}
+    executable: /bin/bash
+  become: false
+  register: nvm_install
+  changed_when: "'is already installed' not in nvm_install.stderr"
+
+- name: Enable Corepack (yarn / pnpm shims)
+  ansible.builtin.shell:
+    cmd: "source {{ ansible_env.HOME }}/.nvm/nvm.sh && corepack enable"
+    executable: /bin/bash
+  become: false
+  changed_when: false
+  when: nodejs_enable_corepack | bool
+
+- name: Install global npm packages
+  ansible.builtin.shell:
+    cmd: "source {{ ansible_env.HOME }}/.nvm/nvm.sh && npm install -g {{ npm_global_packages | join(' ') }}"
+    executable: /bin/bash
+  become: false
+  changed_when: true
+  when: npm_global_packages | length > 0

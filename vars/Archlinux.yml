@@ -22,13 +22,29 @@ system_packages:
   - spotify-launcher
 
 gui_packages:
-  - firefox
-  - firefox-i18n-de
   - thunderbird
   - vlc
   - haruna
-  # IntelliJ IDEA is installed via the JetBrains Toolbox role (not a package here).
+  # Firefox is intentionally NOT installed here: it is removed once Google Chrome
+  # is present (see roles/aur). IntelliJ IDEA comes via the JetBrains Toolbox role.
 
 # AUR packages — built and installed by roles/aur (needs yay/base-devel).
 aur_packages:
   - google-chrome
+
+# Docker (roles/docker + roles/docker-compose)
+docker_packages:
+  - docker
+  - docker-buildx
+docker_compose_packages:
+  - docker-compose
+
+# Perl modules from the OS package manager (Arch naming: perl-<module>).
+perl_os_packages: []
+# perl_os_packages:
+#   - perl-json
+#   - perl-libwww
+
+# Packages to always ensure ABSENT (e.g. an OS-provided app superseded by a
+# third-party install). Firefox is handled conditionally in roles/aur instead.
+packages_absent: []

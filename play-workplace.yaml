@@ -11,6 +11,10 @@
     - packages
     - role: aur
       when: ansible_facts['os_family'] == 'Archlinux'
+    - nodejs
+    - perl
+    - docker
+    - docker-compose
     - starship
     - claude-code
     - role: jetbrains-toolbox

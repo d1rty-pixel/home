@@ -1,0 +1,17 @@
+---
+# nvm release to install (https://github.com/nvm-sh/nvm/releases).
+nvm_version: "v0.40.1"
+
+# Which Node.js to install and pin as the default.
+node_version: "--lts"        # e.g. "--lts", "22", "20.11.1"
+node_default_alias: "lts/*"  # what `nvm alias default` points at
+
+# Enable Corepack so `yarn` / `pnpm` are available without extra installs.
+nodejs_enable_corepack: true
+
+# Global npm packages to install into the active Node (uncomment as needed).
+npm_global_packages: []
+# npm_global_packages:
+#   - typescript
+#   - eslint
+#   - prettier

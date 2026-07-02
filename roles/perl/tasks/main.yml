@@ -1,0 +1,27 @@
+---
+# Two ways to get Perl modules:
+#  1. perl_os_packages  — from the OS package manager (PREFERRED; per-OS names in vars/)
+#  2. perl_cpan_modules — from CPAN via cpanm (DISCOURAGED; source build, bypasses pacman/apt)
+
+- name: Install Perl modules from the OS package manager
+  ansible.builtin.package:
+    name: "{{ perl_os_packages }}"
+    state: present
+  become: true
+  when: perl_os_packages | length > 0
+
+- name: Install Perl modules from CPAN (discouraged — prefer OS packages)
+  when: perl_cpan_modules | length > 0
+  block:
+    - name: Ensure cpanminus is installed
+      ansible.builtin.package:
+        name: cpanminus
+        state: present
+      become: true
+
+    - name: Install CPAN modules with cpanm
+      community.general.cpanm:
+        name: "{{ item }}"
+        notest: true
+      loop: "{{ perl_cpan_modules }}"
+      become: true

@@ -1,0 +1,8 @@
+---
+# Depends on the docker role (engine + service). Installs the Compose v2 plugin,
+# invoked as `docker compose`.
+- name: Install Docker Compose
+  ansible.builtin.package:
+    name: "{{ docker_compose_packages }}"
+    state: present
+  become: true

@@ -48,6 +48,14 @@
     update_cache: true
   become: true
 
+- name: Remove any OS-provided Spotify package superseded by spotify-client
+  ansible.builtin.apt:
+    name:
+      - spotify        # some derivatives ship a differently-named/transitional pkg
+    state: absent
+  become: true
+  failed_when: false   # harmless no-op when no such package exists
+
 # --- Google Chrome (Google's apt repository) -------------------------------
 - name: Fetch the Google signing key
   ansible.builtin.get_url:
@@ -74,4 +82,10 @@
     name: google-chrome-stable
     state: present
     update_cache: true
+  become: true
+
+- name: Remove Firefox now that Chrome is installed
+  ansible.builtin.apt:
+    name: firefox-esr
+    state: absent
   become: true

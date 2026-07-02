@@ -22,15 +22,31 @@ system_packages:
   # NOTE: starship is installed via roles/starship (official installer), not apt.
 
 gui_packages:
-  - firefox-esr        # TODO: Ubuntu ships 'firefox' as a snap; adjust per distro
   - thunderbird
   - vlc
   - haruna
+  # Firefox (firefox-esr) is intentionally NOT installed: it's removed once Google
+  # Chrome is present (see Debian-thirdparty.yml).
 
 # Spotify and Google Chrome are NOT plain apt packages — they come from third-party
 # apt repos and are installed by roles/packages/tasks/Debian-thirdparty.yml.
 # JetBrains Toolbox (which manages IntelliJ IDEA) is installed by the shared,
 # OS-agnostic `jetbrains-toolbox` role. All are gated by install_gui.
+
+# Docker (roles/docker + roles/docker-compose)
+docker_packages:
+  - docker.io
+docker_compose_packages:
+  - docker-compose     # TODO: prefer 'docker-compose-plugin' from Docker's apt repo
+
+# Perl modules from apt (Debian naming: lib<module>-perl).
+perl_os_packages: []
+# perl_os_packages:
+#   - libjson-perl
+#   - libwww-perl
+
+# Packages to always ensure ABSENT.
+packages_absent: []
 
 # Not used on Debian, kept so shared tasks referencing it don't error.
 aur_packages: []

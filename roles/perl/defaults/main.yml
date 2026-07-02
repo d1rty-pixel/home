@@ -1,0 +1,8 @@
+---
+# CPAN modules, installed with cpanm. AVOID THIS LIST where possible: CPAN builds
+# from source outside the OS package manager, so it bypasses system updates and can
+# clash with distro-packaged Perl. Only list modules here that aren't packaged for
+# your distro. Prefer `perl_os_packages` (defined per-OS in vars/) instead.
+perl_cpan_modules: []
+# perl_cpan_modules:
+#   - Some::Unpackaged::Module
