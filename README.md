@@ -15,7 +15,8 @@ git clone https://github.com/d1rty-pixel/home.git ~/Projekte/workplace
 ~/Projekte/workplace/bootstrap.sh
 ```
 
-To push changes back, switch the remote to SSH once (needs a key on your GitHub account):
+Don't have an SSH key yet? `bootstrap.sh` will offer to create one and walk you through adding
+it to GitHub. To push changes back, point the remote at SSH once:
 
 ```sh
 cd ~/Projekte/workplace
@@ -24,10 +25,13 @@ git remote set-url origin git@github.com:d1rty-pixel/home.git
 
 `bootstrap.sh` will:
 1. **Check you have sudo** (aborts early with instructions if not).
-2. Detect the OS family and install prerequisites (`git`, `ansible`, build tools, `curl`).
-3. Clone/update this repo to `~/Projekte/workplace`.
-4. Install the required Ansible collections.
-5. Run `site.yml` (prompts once for your sudo password).
+2. Detect the OS family and install prerequisites (`git`, `ansible`, build tools, `curl`, `openssh`).
+3. **SSH key:** if you don't already have one in `~/.ssh`, it offers to generate an ed25519 key,
+   prints the public half with the GitHub upload URL, waits while you add it, then tests the
+   connection. (Not required for the HTTPS clone — this is so you can *push* later.)
+4. Clone/update this repo to `~/Projekte/workplace`.
+5. Install the required Ansible collections.
+6. Run `site.yml` (prompts once for your sudo password).
 
 After it finishes, log out/in (or `exec bash`) so the shell change, `$EDITOR` and the
 starship prompt take effect.
