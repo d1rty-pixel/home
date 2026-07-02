@@ -111,17 +111,18 @@ so a new machine comes up already configured. The credential files (`key4.db`,
 `logins.json`) and `prefs.js` are **Ansible-Vault-encrypted**, so only ciphertext lives
 in git.
 
-Capture / update from a configured machine (Thunderbird **closed**):
+**Capture** (pull your current setup into the repo) is a separate maintenance
+playbook — deliberately *not* part of provisioning, and it runs the opposite
+direction (local machine → repo). Do it from a configured machine, Thunderbird
+**closed**, with a vault password file present (a task can't answer a vault prompt):
 
 ```sh
-# optional: avoid the prompt by storing the vault password (gitignored)
-printf 'your-vault-password' > .vault-pass && chmod 600 .vault-pass
-
-scripts/capture-thunderbird.sh        # copies + vault-encrypts the profile files
+printf 'your-vault-password' > .vault-pass && chmod 600 .vault-pass   # gitignored
+ansible-playbook capture-thunderbird.yml
 git add roles/thunderbird/files/profile && git commit
 ```
 
-Deploy is automatic during `bootstrap.sh`: it detects the vault-encrypted files and
+**Deploy** is automatic during `bootstrap.sh`: it detects the vault-encrypted files and
 either reads `./.vault-pass` or prompts (`--ask-vault-pass`). The role **won't overwrite**
 an already-configured profile (`force: false`) and refuses to run while Thunderbird is
 open. It's a no-op until a capture exists. Disable with `deploy_thunderbird: false`.
