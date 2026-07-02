@@ -1,0 +1,13 @@
+---
+# Stable package .desktop names (not machine-generated userapp-*.desktop files).
+default_browser_desktop: "google-chrome.desktop"
+default_mail_desktop: "org.mozilla.Thunderbird.desktop"
+
+# MIME / URL-scheme -> default application, written to ~/.config/mimeapps.list.
+default_apps_associations:
+  "x-scheme-handler/http": "{{ default_browser_desktop }}"
+  "x-scheme-handler/https": "{{ default_browser_desktop }}"
+  "text/html": "{{ default_browser_desktop }}"
+  "x-scheme-handler/mailto": "{{ default_mail_desktop }}"
+  "x-scheme-handler/mid": "{{ default_mail_desktop }}"
+  "message/rfc822": "{{ default_mail_desktop }}"

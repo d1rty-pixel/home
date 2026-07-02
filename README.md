@@ -83,6 +83,7 @@ roles/
   claude-code/        installs the claude CLI
   jetbrains-toolbox/  installs JetBrains Toolbox (tarball; manages IntelliJ IDEA)
   thunderbird/        deploys captured accounts + passwords (Ansible Vault)
+  default-apps/       sets default browser (Chrome) + mail client (Thunderbird)
   dotfiles/           symlinks configs into $HOME, templates .gitconfig
   shell/              sets bash as the default login shell
 ```

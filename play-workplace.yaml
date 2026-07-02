@@ -24,5 +24,8 @@
         - install_gui | bool
         - deploy_thunderbird | bool
       tags: thunderbird
+    - role: default-apps
+      when: install_gui | bool
+      tags: default-apps
     - dotfiles
     - shell

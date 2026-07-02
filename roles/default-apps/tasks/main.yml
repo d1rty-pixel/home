@@ -1,0 +1,22 @@
+---
+# Set the default web browser (Chrome) and mail client (Thunderbird) via the XDG
+# mimeapps.list — portable across KDE/GNOME and needs no running desktop session.
+# ini_file only touches the specified keys, leaving other associations intact.
+
+- name: Ensure ~/.config exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.config"
+    state: directory
+    mode: "0755"
+
+- name: Set default browser and mail client in mimeapps.list
+  community.general.ini_file:
+    path: "{{ ansible_facts.env.HOME }}/.config/mimeapps.list"
+    section: "Default Applications"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: true
+    mode: "0644"
+  loop: "{{ default_apps_associations | dict2items }}"
+  loop_control:
+    label: "{{ item.key }} = {{ item.value }}"

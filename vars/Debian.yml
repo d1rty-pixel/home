@@ -48,5 +48,8 @@ perl_os_packages: []
 # Packages to always ensure ABSENT.
 packages_absent: []
 
+# Thunderbird's .desktop name differs on Debian/Ubuntu (verify on the target).
+default_mail_desktop: "thunderbird.desktop"   # TODO: may be org.mozilla.Thunderbird.desktop
+
 # Not used on Debian, kept so shared tasks referencing it don't error.
 aur_packages: []
