@@ -7,6 +7,6 @@
 
 - name: Set bash as the default login shell
   ansible.builtin.user:
-    name: "{{ ansible_user_id }}"
+    name: "{{ ansible_facts.user_id }}"
     shell: /bin/bash
   become: true

@@ -10,6 +10,6 @@
   ansible.builtin.shell:
     cmd: "curl -fsSL https://claude.ai/install.sh | bash"
   args:
-    creates: "{{ ansible_env.HOME }}/.local/bin/claude"
+    creates: "{{ ansible_facts.env.HOME }}/.local/bin/claude"
   become: false
   when: claude_check.rc != 0

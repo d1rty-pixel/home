@@ -5,7 +5,7 @@
 - name: Install nvm (Node Version Manager)
   ansible.builtin.shell:
     cmd: "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash"
-    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    creates: "{{ ansible_facts.env.HOME }}/.nvm/nvm.sh"
   environment:
     PROFILE: /dev/null       # don't let the installer edit our managed shell rc
   become: false
@@ -13,7 +13,7 @@
 - name: "Install Node.js ({{ node_version }}) and set it as default"
   ansible.builtin.shell:
     cmd: >
-      source {{ ansible_env.HOME }}/.nvm/nvm.sh &&
+      source {{ ansible_facts.env.HOME }}/.nvm/nvm.sh &&
       nvm install {{ node_version }} &&
       nvm alias default {{ node_default_alias }}
     executable: /bin/bash
@@ -23,7 +23,7 @@
 
 - name: Enable Corepack (yarn / pnpm shims)
   ansible.builtin.shell:
-    cmd: "source {{ ansible_env.HOME }}/.nvm/nvm.sh && corepack enable"
+    cmd: "source {{ ansible_facts.env.HOME }}/.nvm/nvm.sh && corepack enable"
     executable: /bin/bash
   become: false
   changed_when: false
@@ -31,7 +31,7 @@
 
 - name: Install global npm packages
   ansible.builtin.shell:
-    cmd: "source {{ ansible_env.HOME }}/.nvm/nvm.sh && npm install -g {{ npm_global_packages | join(' ') }}"
+    cmd: "source {{ ansible_facts.env.HOME }}/.nvm/nvm.sh && npm install -g {{ npm_global_packages | join(' ') }}"
     executable: /bin/bash
   become: false
   changed_when: true
