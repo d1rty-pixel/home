@@ -13,6 +13,7 @@
   register: yay_check
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Build and install yay from the AUR
   when: yay_check.rc != 0

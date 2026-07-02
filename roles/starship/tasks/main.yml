@@ -11,6 +11,7 @@
   register: starship_check
   changed_when: false
   failed_when: false
+  check_mode: false
   when: ansible_facts['os_family'] != 'Archlinux'
 
 - name: Install starship via the official installer (Debian/other)
