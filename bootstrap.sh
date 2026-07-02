@@ -6,13 +6,13 @@
 #   ./bootstrap.sh
 #
 # Environment overrides:
-#   WORKPLACE_REPO   clone URL (default: git@github.com:equinox/workplace.git)
-#                    e.g. WORKPLACE_REPO=https://github.com/equinox/workplace.git
+#   WORKPLACE_REPO   clone URL (default: HTTPS, so no SSH key is needed on a fresh box)
+#                    e.g. WORKPLACE_REPO=git@github.com:d1rty-pixel/home.git
 #   WORKPLACE_DIR    checkout location (default: $HOME/Projekte/workplace)
 #
 set -euo pipefail
 
-REPO_URL="${WORKPLACE_REPO:-git@github.com:equinox/workplace.git}"
+REPO_URL="${WORKPLACE_REPO:-https://github.com/d1rty-pixel/home.git}"
 REPO_DIR="${WORKPLACE_DIR:-$HOME/Projekte/workplace}"
 
 info() { printf '\033[1;34m::\033[0m %s\n' "$*"; }
@@ -78,7 +78,7 @@ else
                     | grep -qi 'successfully authenticated'; then
                 warn "SSH auth to GitHub could not be confirmed."
                 warn "Add an SSH key to your GitHub account first, or re-run over HTTPS:"
-                warn "    WORKPLACE_REPO=https://github.com/equinox/workplace.git ./bootstrap.sh"
+                warn "    WORKPLACE_REPO=https://github.com/d1rty-pixel/home.git ./bootstrap.sh"
                 die  "Aborting before clone."
             fi
             ;;

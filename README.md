@@ -8,20 +8,18 @@ future **Debian / Ubuntu** box only needs its package list filled in.
 
 ## Quick start
 
-On a fresh machine:
+On a fresh machine — clones over **HTTPS**, so no SSH key is needed:
 
 ```sh
-# 1. Make sure your SSH key is added to GitHub (this repo clones over SSH).
-# 2. Clone and run:
-git clone git@github.com:equinox/workplace.git ~/Projekte/workplace
+git clone https://github.com/d1rty-pixel/home.git ~/Projekte/workplace
 ~/Projekte/workplace/bootstrap.sh
 ```
 
-No SSH key yet? Clone over HTTPS for the first run:
+To push changes back, switch the remote to SSH once (needs a key on your GitHub account):
 
 ```sh
-WORKPLACE_REPO=https://github.com/equinox/workplace.git \
-  bash -c 'git clone "$WORKPLACE_REPO" ~/Projekte/workplace && ~/Projekte/workplace/bootstrap.sh'
+cd ~/Projekte/workplace
+git remote set-url origin git@github.com:d1rty-pixel/home.git
 ```
 
 `bootstrap.sh` will:
