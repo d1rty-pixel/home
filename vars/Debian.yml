@@ -1,0 +1,30 @@
+---
+# Working stub for a future Debian / Ubuntu machine.
+# Names are mapped to apt equivalents — verify against the target release.
+system_packages:
+  - bash
+  - fish
+  - vim
+  - micro
+  - meld
+  - git
+  - ripgrep
+  - btop
+  - glances
+  - fastfetch          # TODO: only in newer Debian/Ubuntu; may need a backport/PPA
+  - duf
+  - ufw
+  - rsync
+  - wget
+  - pavucontrol
+  # NOTE: no alacritty here — use the distro-default terminal on Debian/Ubuntu.
+  # NOTE: starship is installed via roles/starship (official installer), not apt.
+
+gui_packages:
+  - firefox-esr        # TODO: Ubuntu ships 'firefox' as a snap; adjust per distro
+  - vlc
+  - haruna
+  # TODO: spotify has no apt package — install via flatpak or the official repo.
+
+# Not used on Debian, kept so shared tasks referencing it don't error.
+aur_packages: []

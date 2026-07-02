@@ -1,0 +1,16 @@
+# ~/.gitconfig  (templated by the workplace repo — edit vars in group_vars/all.yml)
+[user]
+	name = {{ git_user_name }}
+	email = {{ git_user_email }}
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[core]
+	editor = vim
+
+[color]
+	ui = auto

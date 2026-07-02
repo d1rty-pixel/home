@@ -1,0 +1,32 @@
+# ~/.config/starship.toml  (managed by the workplace repo)
+# Docs: https://starship.rs/config/
+# Starter config — tweak freely, changes stay git-tracked via the symlink.
+
+add_newline = true
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$cmd_duration\
+$character"""
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold cyan"
+
+[git_branch]
+style = "bold purple"
+
+[git_status]
+style = "bold red"
+
+[cmd_duration]
+min_time = 500
+format = "took [$duration]($style) "
+style = "bold yellow"

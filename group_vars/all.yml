@@ -1,0 +1,13 @@
+---
+# ---------------------------------------------------------------------------
+# Feature toggles
+# ---------------------------------------------------------------------------
+# Install GUI applications (firefox, vlc, ...). Flip to false on a headless box.
+install_gui: true
+
+# ---------------------------------------------------------------------------
+# Git identity — used to template ~/.gitconfig
+# ---------------------------------------------------------------------------
+# TODO: set your real display name here.
+git_user_name: "equinox"
+git_user_email: "equinox@lichtspiele.org"

@@ -1,0 +1,38 @@
+---
+# Arch-only role: make sure an AUR helper (yay) exists, then install AUR packages.
+- name: Ensure base-devel and git are present (needed to build yay)
+  community.general.pacman:
+    name:
+      - base-devel
+      - git
+    state: present
+  become: true
+
+- name: Check whether yay is already installed
+  ansible.builtin.command: command -v yay
+  register: yay_check
+  changed_when: false
+  failed_when: false
+
+- name: Build and install yay from the AUR
+  when: yay_check.rc != 0
+  block:
+    - name: Clone yay-bin from the AUR
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/yay-bin.git
+        dest: /tmp/yay-bin
+        version: master
+
+    - name: Build and install yay-bin (makepkg must not run as root)
+      ansible.builtin.command:
+        cmd: makepkg -si --noconfirm
+        chdir: /tmp/yay-bin
+      become: false
+
+- name: Install AUR packages
+  kewlfft.aur.aur:
+    name: "{{ aur_packages }}"
+    state: present
+    use: yay
+  become: false
+  when: aur_packages | length > 0

@@ -1,0 +1,30 @@
+---
+# Package names for Arch / CachyOS (pacman + AUR).
+system_packages:
+  - bash
+  - fish
+  - vim
+  - micro
+  - meld
+  - git
+  - ripgrep
+  - btop
+  - glances
+  - fastfetch
+  - duf
+  - ufw
+  - rsync
+  - wget
+  - starship
+  - alacritty          # terminal emulator (Arch/CachyOS only)
+  - pavucontrol
+  - spotify-launcher
+
+gui_packages:
+  - firefox
+  - firefox-i18n-de
+  - vlc
+  - haruna
+
+# AUR packages (installed via yay). Empty by default.
+aur_packages: []

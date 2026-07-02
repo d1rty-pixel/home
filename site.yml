@@ -1,0 +1,17 @@
+---
+- name: Provision the workplace
+  hosts: all
+  gather_facts: true
+
+  pre_tasks:
+    - name: Load OS-family-specific variables
+      ansible.builtin.include_vars: "vars/{{ ansible_facts['os_family'] }}.yml"
+
+  roles:
+    - packages
+    - role: aur
+      when: ansible_facts['os_family'] == 'Archlinux'
+    - starship
+    - claude-code
+    - dotfiles
+    - shell

@@ -1,0 +1,13 @@
+---
+# Source tree for the symlinks (the repo's own checkout, so edits stay git-tracked).
+dotfiles_src: "{{ playbook_dir }}/roles/dotfiles/files"
+
+# Each dotfile: `src` is relative to dotfiles_src, `dest` is relative to $HOME.
+dotfiles_links:
+  - { src: "bashrc",                   dest: ".bashrc" }
+  - { src: "bash_profile",             dest: ".bash_profile" }
+  - { src: "fish/config.fish",         dest: ".config/fish/config.fish" }
+  - { src: "fish/fish_variables",      dest: ".config/fish/fish_variables" }
+  - { src: "alacritty/alacritty.toml", dest: ".config/alacritty/alacritty.toml" }
+  - { src: "micro/settings.json",      dest: ".config/micro/settings.json" }
+  - { src: "starship.toml",            dest: ".config/starship.toml" }

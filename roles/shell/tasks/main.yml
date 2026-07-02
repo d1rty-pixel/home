@@ -1,0 +1,12 @@
+---
+- name: Ensure bash is installed
+  ansible.builtin.package:
+    name: bash
+    state: present
+  become: true
+
+- name: Set bash as the default login shell
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/bash
+  become: true

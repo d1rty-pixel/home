@@ -1,0 +1,43 @@
+---
+- name: Ensure parent directories for dotfiles exist
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/{{ item.dest | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ dotfiles_links }}"
+  loop_control:
+    label: "{{ item.dest | dirname }}"
+
+- name: Inspect existing dotfile targets
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/{{ item.dest }}"
+  loop: "{{ dotfiles_links }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  register: dotfile_stats
+
+- name: Back up pre-existing real files (not already symlinks)
+  ansible.builtin.command:
+    cmd: "mv -- '{{ ansible_env.HOME }}/{{ item.item.dest }}' '{{ ansible_env.HOME }}/{{ item.item.dest }}.bak'"
+  loop: "{{ dotfile_stats.results }}"
+  loop_control:
+    label: "{{ item.item.dest }}"
+  when:
+    - item.stat.exists
+    - not item.stat.islnk
+
+- name: Symlink dotfiles from the repo into $HOME
+  ansible.builtin.file:
+    src: "{{ dotfiles_src }}/{{ item.src }}"
+    dest: "{{ ansible_env.HOME }}/{{ item.dest }}"
+    state: link
+    force: true
+  loop: "{{ dotfiles_links }}"
+  loop_control:
+    label: "{{ item.dest }}"
+
+- name: Template ~/.gitconfig
+  ansible.builtin.template:
+    src: gitconfig.j2
+    dest: "{{ ansible_env.HOME }}/.gitconfig"
+    mode: "0644"

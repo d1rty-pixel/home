@@ -1,0 +1,23 @@
+---
+- name: Install starship (Arch/CachyOS)
+  community.general.pacman:
+    name: starship
+    state: present
+  become: true
+  when: ansible_facts['os_family'] == 'Archlinux'
+
+- name: Check whether starship is installed (non-Arch)
+  ansible.builtin.command: command -v starship
+  register: starship_check
+  changed_when: false
+  failed_when: false
+  when: ansible_facts['os_family'] != 'Archlinux'
+
+- name: Install starship via the official installer (Debian/other)
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://starship.rs/install.sh | sh -s -- --yes"
+  become: true
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - starship_check.rc is defined
+    - starship_check.rc != 0
