@@ -148,10 +148,22 @@ ansible-galaxy collection install -r requirements.yml
 # ---------------------------------------------------------------------------
 # 6. run the playbook
 # ---------------------------------------------------------------------------
-# If the repo contains vault-encrypted files, arrange to supply the vault password:
-# use ./.vault-pass if present (no prompt), otherwise ask interactively.
+# If the repo contains vault-encrypted files, make sure a vault password is available.
+# Use ./.vault-pass if present; otherwise prompt once and create it (gitignored, 0600).
 vault_args=()
 if grep -rlq '\$ANSIBLE_VAULT' roles/ 2>/dev/null; then
+    if [ ! -f .vault-pass ]; then
+        info "This repo has vault-encrypted files (e.g. Thunderbird accounts)."
+        printf '   Enter the Ansible Vault password (stored in ./.vault-pass): '
+        read -rs vault_pw; echo
+        if [ -n "$vault_pw" ]; then
+            ( umask 077; printf '%s' "$vault_pw" > .vault-pass )
+            unset vault_pw
+            info "Wrote .vault-pass (gitignored, 0600)."
+        else
+            warn "No password entered — Ansible will prompt interactively instead."
+        fi
+    fi
     if [ -f .vault-pass ]; then
         vault_args=(--vault-password-file .vault-pass)
     else

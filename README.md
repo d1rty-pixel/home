@@ -122,8 +122,9 @@ ansible-playbook capture-thunderbird.yml
 git add roles/thunderbird/files/profile && git commit
 ```
 
-**Deploy** is automatic during `bootstrap.sh`: it detects the vault-encrypted files and
-either reads `./.vault-pass` or prompts (`--ask-vault-pass`). The role **won't overwrite**
+**Deploy** is automatic during `bootstrap.sh`: it detects the vault-encrypted files and,
+if `./.vault-pass` doesn't exist yet, prompts once for the vault password and stores it
+there (gitignored, `0600`) for this and future runs. The role **won't overwrite**
 an already-configured profile (`force: false`) and refuses to run while Thunderbird is
 open. It's a no-op until a capture exists. Disable with `deploy_thunderbird: false`.
 
