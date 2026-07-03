@@ -1,21 +1,26 @@
 ---
-- name: Update apt cache and install system packages
+# Native (official-repo) packages the resolver assigned to apt.
+- name: Update apt cache and install native system packages
   ansible.builtin.apt:
-    name: "{{ system_packages }}"
+    name: "{{ software_plan.plan.native_system }}"
     state: present
     update_cache: true
     cache_valid_time: 3600
   become: true
+  when: software_plan.plan.native_system | length > 0
 
-- name: Install GUI packages
+- name: Install native GUI packages
   ansible.builtin.apt:
-    name: "{{ gui_packages }}"
+    name: "{{ software_plan.plan.native_gui }}"
     state: present
   become: true
   when:
     - install_gui | bool
-    - gui_packages | length > 0
+    - software_plan.plan.native_gui | length > 0
 
-- name: Install third-party desktop apps (Spotify, Google Chrome)
+# Apps the resolver routed to third-party vendor apt repos (Chrome, Spotify).
+- name: Install third-party (vendor-repo) desktop apps
   ansible.builtin.include_tasks: Debian-thirdparty.yml
-  when: install_gui | bool
+  when:
+    - install_gui | bool
+    - software_plan.plan.vendor | length > 0

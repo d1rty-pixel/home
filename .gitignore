@@ -2,5 +2,8 @@
 *.retry
 __pycache__/
 
+# JetBrains IDE project files
+.idea/
+
 # Ansible Vault password — NEVER commit this
 .vault-pass

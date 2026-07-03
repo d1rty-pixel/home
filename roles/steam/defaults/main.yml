@@ -1,0 +1,4 @@
+---
+# Where Steam keeps its client config (the symlinks ~/.steam/steam and ~/.steam/root
+# both point here). loginusers.vdf + config.vdf live under config/.
+steam_config_dir: "{{ ansible_facts.env.HOME }}/.local/share/Steam/config"

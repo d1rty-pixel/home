@@ -1,10 +1,24 @@
 ---
-# Dispatch to the package tasks for the detected OS family.
-- name: Install packages for this OS family
+# Consume the resolved plan (ansible_local.software_plan, exposed as software_plan
+# by roles/software-facts) and feed each bucket to the right module.
+
+# Native packages via the OS family's package manager (pacman / apt).
+- name: Install native packages for this OS family
   ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
-# Remove packages the user always wants gone (e.g. OS-provided apps replaced by a
-# third-party install). Conditional removals (Firefox<-Chrome) live in their roles.
+# Flatpak apps (OS-agnostic). Dormant unless the catalog resolves items to flatpak;
+# assumes flatpak + a remote (e.g. flathub) are configured on the host.
+- name: Install flatpak applications
+  community.general.flatpak:
+    name: "{{ software_plan.plan.flatpak }}"
+    state: present
+  become: true
+  when:
+    - install_gui | bool
+    - software_plan.plan.flatpak | length > 0
+
+# Remove packages the user always wants gone. Conditional replacements
+# (Firefox<-Chrome) are handled in their own roles once the superseder is present.
 - name: Ensure unwanted packages are absent
   ansible.builtin.package:
     name: "{{ packages_absent }}"

@@ -1,16 +1,18 @@
 ---
-- name: Update pacman cache and install system packages
+# Native (official-repo) packages the resolver assigned to pacman.
+- name: Update pacman cache and install native system packages
   community.general.pacman:
-    name: "{{ system_packages }}"
+    name: "{{ software_plan.plan.native_system }}"
     state: present
     update_cache: true
   become: true
+  when: software_plan.plan.native_system | length > 0
 
-- name: Install GUI packages
+- name: Install native GUI packages
   community.general.pacman:
-    name: "{{ gui_packages }}"
+    name: "{{ software_plan.plan.native_gui }}"
     state: present
   become: true
   when:
     - install_gui | bool
-    - gui_packages | length > 0
+    - software_plan.plan.native_gui | length > 0

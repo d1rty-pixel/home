@@ -1,0 +1,95 @@
+---
+# ---------------------------------------------------------------------------
+# OS-agnostic software catalog — the single source of truth for "what to install".
+# ---------------------------------------------------------------------------
+# The on-host resolver (roles/software-facts) reads this, picks the package
+# name(s) for the detected distro, and DECIDES the install method. The resulting
+# plan lands at ansible_local.software_plan.plan and is fed to the native package
+# modules by roles/packages and roles/aur.
+#
+# Per item:
+#   id         logical name (unique).
+#   category   system  -> always installed
+#              gui     -> installed only when install_gui is true
+#   packages   package name(s) for the native manager. A scalar/list applies to
+#              every OS; a map keys by os_family (Archlinux / Debian) with an
+#              optional `default`. An item with no package for the current OS is
+#              skipped (e.g. alacritty on Debian).
+#   method     OPTIONAL. Omit (or set `auto`) to autodetect:
+#                official repos have it        -> native
+#                Arch + not in official repos  -> aur      (e.g. google-chrome)
+#                flatpak_id known + flatpak    -> flatpak
+#              Pin it (scalar or per-OS map) to force: native | aur | vendor_repo | flatpak.
+#   vendor     for method: vendor_repo — which handler in roles/packages installs it.
+#   flatpak_id application id used when the method resolves to flatpak.
+#   supersedes package(s) removed once this item is installed (per-OS map or list).
+# ---------------------------------------------------------------------------
+
+software_catalog:
+  # --- base / CLI (native everywhere) --------------------------------------
+  - { id: bash,        category: system, packages: bash }
+  - { id: fish,        category: system, packages: fish }
+  - { id: vim,         category: system, packages: vim }
+  - { id: micro,       category: system, packages: micro }
+  - { id: meld,        category: system, packages: meld }
+  - { id: git,         category: system, packages: git }
+  - { id: ripgrep,     category: system, packages: ripgrep }
+  - { id: btop,        category: system, packages: btop }
+  - { id: htop,        category: system, packages: htop }
+  - { id: glances,     category: system, packages: glances }
+  - { id: fastfetch,   category: system, packages: fastfetch }
+  - { id: duf,         category: system, packages: duf }
+  - { id: ufw,         category: system, packages: ufw }
+  - { id: rsync,       category: system, packages: rsync }
+  - { id: wget,        category: system, packages: wget }
+  - { id: pavucontrol, category: system, packages: pavucontrol }
+
+  # Terminal emulator — Arch/CachyOS only; Debian keeps its distro default.
+  - { id: alacritty,   category: system, packages: { Archlinux: alacritty } }
+
+  # --- GUI apps (native everywhere) ----------------------------------------
+  - { id: thunderbird, category: gui, packages: thunderbird }
+  - { id: vlc,         category: gui, packages: vlc }
+  - { id: haruna,      category: gui, packages: haruna }
+
+  # --- GUI apps that differ by OS / need a non-native method ----------------
+  # Chrome: Arch has no official package, so `auto` resolves it to the AUR;
+  # on Debian it comes from Google's own apt repo. Firefox is dropped once it's in.
+  - id: chrome
+    category: gui
+    packages:
+      Archlinux: google-chrome
+      Debian: google-chrome-stable
+    method:
+      Debian: vendor_repo
+    vendor: google-chrome
+    supersedes:
+      Archlinux: [firefox, firefox-i18n-de]
+      Debian: [firefox-esr]
+
+  # Spotify: native on Arch (spotify-launcher); vendor apt repo on Debian.
+  - id: spotify
+    category: gui
+    packages:
+      Archlinux: spotify-launcher
+      Debian: spotify-client
+    method:
+      Debian: vendor_repo
+    vendor: spotify
+
+  # Steam: native on Arch (requires the multilib repo, enabled by a pre_task in
+  # play-workplace.yaml before the resolver runs); steam-installer on Debian.
+  # Method pinned to native so it can't be misclassified as AUR if the multilib
+  # sync db isn't refreshed yet at fact-gathering time.
+  - id: steam
+    category: gui
+    packages:
+      Archlinux: steam
+      Debian: steam-installer
+    method:
+      Archlinux: native
+
+  # Netflix: no native Linux client — an unofficial AUR wrapper (Arch only).
+  # `auto` resolves it to the AUR (pacman -Si netflix misses). No Debian package,
+  # so the resolver skips it there.
+  - { id: netflix, category: gui, packages: { Archlinux: netflix } }

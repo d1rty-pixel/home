@@ -46,8 +46,8 @@
 
 - name: Install AUR packages (build as user, install via become)
   ansible.builtin.include_tasks: install_aur_pkg.yml
-  loop: "{{ aur_packages }}"
-  when: aur_packages | length > 0
+  loop: "{{ software_plan.plan.aur }}"
+  when: software_plan.plan.aur | length > 0
 
 # Google Chrome supersedes Firefox: remove it, but only once Chrome is actually
 # installed, so a failed Chrome build never leaves the machine with no browser.

@@ -1,0 +1,87 @@
+---
+# Maintenance playbook — NOT part of provisioning. Captures this machine's Steam login
+# SETTINGS (account name + autologin flags, general client config) into the repo,
+# vault-encrypted, so the steam role can pre-fill the login screen on a new machine.
+# It does NOT capture a password or session token (Steam stores no plaintext password;
+# the auto-login ssfn*/ConnectCache tokens are hardware/Steam-Guard bound). Run it after
+# you change your Steam setup:
+#
+#   ansible-playbook capture-steam.yml
+#
+# Requires a vault password FILE (a task can't answer an interactive vault prompt):
+#   printf 'your-vault-password' > .vault-pass && chmod 600 .vault-pass
+#
+- name: Capture Steam settings into the repo (vault-encrypted)
+  hosts: localhost
+  gather_facts: true
+  vars:
+    steam_files: [loginusers.vdf, config.vdf]
+    src_dir: "{{ ansible_facts.env.HOME }}/.local/share/Steam/config"
+    dest: "{{ playbook_dir }}/roles/steam/files/config"
+    vault_password_file: "{{ playbook_dir }}/.vault-pass"
+
+  tasks:
+    - name: Require a vault password file
+      ansible.builtin.stat:
+        path: "{{ vault_password_file }}"
+      register: vpf
+
+    - name: Fail if no vault password file
+      ansible.builtin.fail:
+        msg: >-
+          Create {{ vault_password_file }} first:
+          printf 'your-vault-password' > .vault-pass && chmod 600 .vault-pass
+      when: not vpf.stat.exists
+
+    - name: Ensure Steam is not running
+      ansible.builtin.command: pgrep -x steam
+      register: steam_running
+      changed_when: false
+      failed_when: steam_running.rc == 0
+      check_mode: false
+
+    - name: Check which settings files exist
+      ansible.builtin.stat:
+        path: "{{ src_dir }}/{{ item }}"
+      loop: "{{ steam_files }}"
+      register: steam_stat
+
+    - name: Ensure the destination directory exists
+      ansible.builtin.file:
+        path: "{{ dest }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy settings files into the repo
+      ansible.builtin.copy:
+        src: "{{ item.stat.path }}"
+        dest: "{{ dest }}/{{ item.item }}"
+        mode: "0600"
+        remote_src: true
+      loop: "{{ steam_stat.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.stat.exists
+
+    - name: Vault-encrypt the copied files
+      ansible.builtin.command:
+        cmd: "ansible-vault encrypt --vault-password-file {{ vault_password_file }} {{ dest }}/{{ item.item }}"
+      loop: "{{ steam_stat.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.stat.exists
+      changed_when: true
+
+    - name: Verify each file is actually encrypted (never commit plaintext)
+      ansible.builtin.command: "head -c 15 {{ dest }}/{{ item.item }}"
+      register: steam_hdr
+      changed_when: false
+      loop: "{{ steam_stat.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.stat.exists
+      failed_when: "'$ANSIBLE_VAULT' not in steam_hdr.stdout"
+
+    - name: Next step
+      ansible.builtin.debug:
+        msg: "Captured. Review, then: git add roles/steam/files/config && git commit"

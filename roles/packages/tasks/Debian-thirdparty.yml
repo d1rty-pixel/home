@@ -1,7 +1,12 @@
 ---
 # Desktop apps that live in third-party apt repos rather than Debian's own.
+# Driven by the resolver: each block runs only if that vendor is in the plan.
 # UNTESTED: transcribed from each vendor's documented install steps — verify the
 # key URLs / suite names on a real Debian/Ubuntu box (vendors rotate signing keys).
+
+- name: List the vendor-repo apps the resolver selected
+  ansible.builtin.set_fact:
+    vendor_repo_apps: "{{ software_plan.plan.vendor | map(attribute='vendor') | list }}"
 
 - name: Ensure apt keyring helpers are present
   ansible.builtin.apt:
@@ -20,72 +25,78 @@
   become: true
 
 # --- Spotify (official repository) -----------------------------------------
-- name: Fetch the Spotify signing key
-  ansible.builtin.get_url:
-    # NOTE: Spotify rotates this key ID periodically; update from spotify.com if apt complains.
-    url: https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg
-    dest: /tmp/spotify.pub
-    mode: "0644"
-  become: true
+- name: Install Spotify from its apt repository
+  when: "'spotify' in vendor_repo_apps"
+  block:
+    - name: Fetch the Spotify signing key
+      ansible.builtin.get_url:
+        # NOTE: Spotify rotates this key ID periodically; update from spotify.com if apt complains.
+        url: https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg
+        dest: /tmp/spotify.pub
+        mode: "0644"
+      become: true
 
-- name: Install the Spotify keyring
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/spotify.gpg /tmp/spotify.pub
-    creates: /usr/share/keyrings/spotify.gpg
-  become: true
+    - name: Install the Spotify keyring
+      ansible.builtin.command:
+        cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/spotify.gpg /tmp/spotify.pub
+        creates: /usr/share/keyrings/spotify.gpg
+      become: true
 
-- name: Add the Spotify apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/spotify.gpg] https://repository.spotify.com stable non-free"
-    filename: spotify
-    state: present
-  become: true
+    - name: Add the Spotify apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/spotify.gpg] https://repository.spotify.com stable non-free"
+        filename: spotify
+        state: present
+      become: true
 
-- name: Install Spotify
-  ansible.builtin.apt:
-    name: spotify-client
-    state: present
-    update_cache: true
-  become: true
+    - name: Install Spotify
+      ansible.builtin.apt:
+        name: spotify-client
+        state: present
+        update_cache: true
+      become: true
 
-- name: Remove any OS-provided Spotify package superseded by spotify-client
-  ansible.builtin.apt:
-    name:
-      - spotify        # some derivatives ship a differently-named/transitional pkg
-    state: absent
-  become: true
-  failed_when: false   # harmless no-op when no such package exists
+    - name: Remove any OS-provided Spotify package superseded by spotify-client
+      ansible.builtin.apt:
+        name:
+          - spotify        # some derivatives ship a differently-named/transitional pkg
+        state: absent
+      become: true
+      failed_when: false   # harmless no-op when no such package exists
 
 # --- Google Chrome (Google's apt repository) -------------------------------
-- name: Fetch the Google signing key
-  ansible.builtin.get_url:
-    url: https://dl.google.com/linux/linux_signing_key.pub
-    dest: /tmp/google.pub
-    mode: "0644"
-  become: true
+- name: Install Google Chrome from Google's apt repository
+  when: "'google-chrome' in vendor_repo_apps"
+  block:
+    - name: Fetch the Google signing key
+      ansible.builtin.get_url:
+        url: https://dl.google.com/linux/linux_signing_key.pub
+        dest: /tmp/google.pub
+        mode: "0644"
+      become: true
 
-- name: Install the Google Chrome keyring
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/google-chrome.gpg /tmp/google.pub
-    creates: /usr/share/keyrings/google-chrome.gpg
-  become: true
+    - name: Install the Google Chrome keyring
+      ansible.builtin.command:
+        cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/google-chrome.gpg /tmp/google.pub
+        creates: /usr/share/keyrings/google-chrome.gpg
+      become: true
 
-- name: Add the Google Chrome apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main"
-    filename: google-chrome
-    state: present
-  become: true
+    - name: Add the Google Chrome apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main"
+        filename: google-chrome
+        state: present
+      become: true
 
-- name: Install Google Chrome
-  ansible.builtin.apt:
-    name: google-chrome-stable
-    state: present
-    update_cache: true
-  become: true
+    - name: Install Google Chrome
+      ansible.builtin.apt:
+        name: google-chrome-stable
+        state: present
+        update_cache: true
+      become: true
 
-- name: Remove Firefox now that Chrome is installed
-  ansible.builtin.apt:
-    name: firefox-esr
-    state: absent
-  become: true
+    - name: Remove Firefox now that Chrome is installed
+      ansible.builtin.apt:
+        name: firefox-esr
+        state: absent
+      become: true

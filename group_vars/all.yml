@@ -10,6 +10,12 @@ install_gui: true
 # scripts/capture-thunderbird.sh). No-op until a capture exists.
 deploy_thunderbird: true
 
+# Deploy captured Steam login SETTINGS (account name + autologin flag). This only
+# pre-fills the Steam login screen — no password or session token is stored, so you
+# still enter your password + Steam Guard once. Needs the vault password and a capture
+# in roles/steam/files/config/ (run capture-steam.yml). No-op until a capture exists.
+deploy_steam: true
+
 # ---------------------------------------------------------------------------
 # Git identity — used to template ~/.gitconfig
 # ---------------------------------------------------------------------------

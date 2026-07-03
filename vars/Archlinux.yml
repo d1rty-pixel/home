@@ -1,36 +1,9 @@
 ---
-# Package names for Arch / CachyOS (pacman + AUR).
-system_packages:
-  - bash
-  - fish
-  - vim
-  - micro
-  - meld
-  - git
-  - ripgrep
-  - btop
-  - htop
-  - glances
-  - fastfetch
-  - duf
-  - ufw
-  - rsync
-  - wget
-  - starship
-  - alacritty          # terminal emulator (Arch/CachyOS only)
-  - pavucontrol
-  - spotify-launcher
-
-gui_packages:
-  - thunderbird
-  - vlc
-  - haruna
-  # Firefox is intentionally NOT installed here: it is removed once Google Chrome
-  # is present (see roles/aur). IntelliJ IDEA comes via the JetBrains Toolbox role.
-
-# AUR packages — built and installed by roles/aur (needs yay/base-devel).
-aur_packages:
-  - google-chrome
+# Arch / CachyOS role-specific vars.
+#
+# NOTE: system / GUI / AUR package names now live in the OS-agnostic
+# vars/software_catalog.yml and are resolved on the host by roles/software-facts.
+# Only vars consumed by other roles remain here.
 
 # Docker (roles/docker + roles/docker-compose)
 docker_packages:
@@ -45,6 +18,7 @@ perl_os_packages: []
 #   - perl-json
 #   - perl-libwww
 
-# Packages to always ensure ABSENT (e.g. an OS-provided app superseded by a
-# third-party install). Firefox is handled conditionally in roles/aur instead.
+# Packages to always ensure ABSENT (unconditional). Conditional replacements
+# (Firefox<-Chrome) are declared via `supersedes` in the catalog and removed by
+# their roles once the superseder is installed.
 packages_absent: []

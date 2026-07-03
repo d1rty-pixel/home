@@ -7,7 +7,39 @@
     - name: Load OS-family-specific variables
       ansible.builtin.include_vars: "vars/{{ ansible_facts['os_family'] }}.yml"
 
+    - name: Load the OS-agnostic software catalog
+      ansible.builtin.include_vars: vars/software_catalog.yml
+
+    # steam lives in Arch's [multilib] repo. Enable it BEFORE the software-facts
+    # role resolves the catalog, or `pacman -Si steam` misses and the resolver
+    # would misclassify steam as an AUR package.
+    - name: Ensure Arch multilib repo is enabled (needed for steam)
+      when: ansible_facts['os_family'] == 'Archlinux'
+      block:
+        - name: Check which pacman repos are enabled
+          ansible.builtin.command: pacman-conf --repo-list
+          register: pacman_repos
+          changed_when: false
+
+        - name: Uncomment the [multilib] section in pacman.conf
+          ansible.builtin.replace:
+            path: /etc/pacman.conf
+            regexp: '(?m)^#\s*\[multilib\]\n#\s*(Include\s*=\s*/etc/pacman.d/mirrorlist)'
+            replace: '[multilib]\n\1'
+          become: true
+          when: "'multilib' not in pacman_repos.stdout_lines"
+          register: multilib_change
+
+        - name: Refresh the pacman db after enabling multilib
+          community.general.pacman:
+            update_cache: true
+          become: true
+          when: multilib_change is changed
+
   roles:
+    # Resolve the catalog into an install plan on the host (custom fact) first,
+    # so the package roles can consume software_plan.plan.*
+    - software-facts
     - packages
     - role: aur
       when: ansible_facts['os_family'] == 'Archlinux'
@@ -24,6 +56,11 @@
         - install_gui | bool
         - deploy_thunderbird | bool
       tags: thunderbird
+    - role: steam
+      when:
+        - install_gui | bool
+        - deploy_steam | bool
+      tags: steam
     - role: default-apps
       when: install_gui | bool
       tags: default-apps

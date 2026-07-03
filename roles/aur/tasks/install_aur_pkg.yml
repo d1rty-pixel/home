@@ -4,7 +4,7 @@
 # `item` is the AUR package name.
 #
 # Limitation: assumes build/runtime deps are available in the official repos
-# (add them to system_packages). Packages with AUR dependencies aren't handled here.
+# (add a native catalog entry for them). Packages with AUR dependencies aren't handled here.
 
 - name: "Check whether {{ item }} is already installed"
   ansible.builtin.command: "pacman -Qq {{ item }}"

@@ -1,0 +1,5 @@
+---
+# Ansible's default local-facts directory. The resolver is deployed here as a
+# `.fact` script (so it surfaces as ansible_local.software_plan) alongside a JSON
+# render of the catalog it reads.
+facts_dir: /etc/ansible/facts.d

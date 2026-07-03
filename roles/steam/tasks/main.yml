@@ -1,0 +1,46 @@
+---
+# Deploys captured Steam login SETTINGS (loginusers.vdf + config.vdf) so a new
+# machine shows your account pre-selected on the Steam login screen. It does NOT
+# log you in: Steam stores no plaintext password, and the auto-login token files
+# (ssfn*, config.vdf ConnectCache) are hardware/Steam-Guard bound and not captured
+# here — you enter your password + Steam Guard once. Files are Ansible-Vault-
+# encrypted at rest and decrypted on copy. Capture them with capture-steam.yml.
+
+- name: Look for captured (vault-encrypted) Steam settings
+  ansible.builtin.set_fact:
+    steam_captured: "{{ query('fileglob', 'config/*') }}"
+
+- name: Deploy Steam settings
+  when: steam_captured | length > 0
+  block:
+    - name: Check whether Steam is running
+      ansible.builtin.command: pgrep -x steam
+      register: steam_running
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Refuse to deploy while Steam is running
+      ansible.builtin.fail:
+        msg: >-
+          Steam is running — close it first. It rewrites loginusers.vdf / config.vdf
+          on exit and would overwrite the deployed settings.
+      when: steam_running.rc == 0
+
+    - name: Ensure the Steam config directory exists
+      ansible.builtin.file:
+        path: "{{ steam_config_dir }}"
+        state: directory
+        mode: "0755"
+
+    # force:false → never clobber an already-configured machine; this only seeds a
+    # fresh one. To re-deploy, remove the target files first.
+    - name: Deploy the vault-encrypted Steam settings (decrypted on copy)
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ steam_config_dir }}/{{ item | basename }}"
+        mode: "0644"
+        force: false
+      loop: "{{ steam_captured }}"
+      loop_control:
+        label: "{{ item | basename }}"

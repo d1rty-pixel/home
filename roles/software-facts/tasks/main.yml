@@ -1,0 +1,50 @@
+---
+# Deploy the on-host resolver + catalog, then gather the custom fact it produces.
+# After this role, ansible_local.software_plan holds the resolved install plan.
+
+- name: Ensure the local facts directory exists
+  ansible.builtin.file:
+    path: "{{ facts_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+# The catalog is authored as YAML (vars/software_catalog.yml) but the resolver
+# reads it as JSON — Ansible converts it here so there's one source of truth.
+- name: Render the software catalog to JSON on the host
+  ansible.builtin.copy:
+    content: "{{ software_catalog | to_nice_json }}\n"
+    dest: "{{ facts_dir }}/software_catalog.json"
+    mode: "0644"
+  become: true
+
+- name: Deploy the resolver as a custom-fact script
+  ansible.builtin.copy:
+    src: resolve_software_plan.py
+    dest: "{{ facts_dir }}/software_plan.fact"
+    mode: "0755"
+  become: true
+
+# Re-gather local facts so ansible_local.software_plan reflects what we just
+# deployed (the initial gather_facts ran before these files existed).
+- name: Re-gather local facts (populates ansible_local.software_plan)
+  ansible.builtin.setup:
+    filter: ansible_local
+
+- name: Expose the resolved plan as `software_plan`
+  ansible.builtin.set_fact:
+    software_plan: "{{ ansible_local.software_plan }}"
+
+- name: Fail early if the resolver reported an error
+  ansible.builtin.assert:
+    that:
+      - "'error' not in software_plan"
+    fail_msg: "software_plan resolver failed: {{ software_plan.error | default('unknown') }}"
+    success_msg: "Resolved install plan on {{ software_plan.os_family }} (pkg_mgr={{ software_plan.pkg_mgr }})."
+
+- name: Warn about any software with no install path on this OS
+  ansible.builtin.debug:
+    msg: >-
+      No install method found for: {{ software_plan.plan.unresolved | map(attribute='id') | join(', ') }}.
+      Add a package name or a method to vars/software_catalog.yml.
+  when: software_plan.plan.unresolved | length > 0
